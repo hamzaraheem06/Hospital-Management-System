@@ -321,7 +321,7 @@ public class Main {
 
         // Patient schedules an appointment
         LocalDate appointmentDate = LocalDate.of(2025, 5, 1);
-        patient.scheduleAppointment(doctor, appointmentDate);
+        patient.scheduleAppointment(doctor, patient, appointmentDate);
 
         // Fetch the created appointment from the central manager
         Appointment scheduledAppointment = appointmentManager.getAppointments().getFirst();

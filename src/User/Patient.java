@@ -115,11 +115,13 @@ public class Patient extends User {
     }
 
     // consistent appointment methods for users
-    public void scheduleAppointment(Doctor doctor, LocalDate date) {
+    @Override
+    public void scheduleAppointment( Doctor doctor, Patient patient, LocalDate date) {
         appointmentManager.requestAppointment(date, doctor, this);
         System.out.println("Appointment scheduled for " + date + ".");
     }
 
+    @Override
     public void cancelAppointment(Appointment appointment) {
         appointmentManager.cancelAppointment(appointment);
     }

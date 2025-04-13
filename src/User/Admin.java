@@ -108,11 +108,13 @@ public class Admin extends User {
         System.out.println("Email reminder sent to user ID: " + userID);
     }
 
+    @Override
     public void scheduleAppointment(Doctor doctor, Patient patient, LocalDate date) {
         appointmentManager.requestAppointment(date, doctor, patient);
         System.out.println("Appointment scheduled for " + date + ".");
     }
 
+    @Override
     public void cancelAppointment(Appointment appointment) {
         appointmentManager.cancelAppointment(appointment);
     }

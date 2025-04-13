@@ -1,5 +1,7 @@
 package User;
 
+import Appointment.Appointment;
+
 import java.util.Random; // using the Random class to generate a user id
 import java.util.regex.Pattern; // using the Pattern class for credentials and information matching
 import java.time.Period; // using the Calendar class for age calculation
@@ -144,6 +146,11 @@ public abstract class User {
         }
         return id;
     }
+
+    // declaring abstract methods
+    public abstract void scheduleAppointment(Doctor doctor, Patient patient, LocalDate date);
+
+    public abstract void cancelAppointment(Appointment appointment);
 
     public static boolean isValidName(String name) {
         return Pattern.matches(NAME_PATTERN, name);
