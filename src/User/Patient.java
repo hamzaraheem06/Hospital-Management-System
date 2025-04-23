@@ -12,10 +12,10 @@ import D_P_Interaction.MedicalDatabase;
 public class Patient extends User {
     // defining all the private attributes for security
     private final String patientID = User.randomIdGenerator();
-    private ArrayList<LocalDate> checkupHistory = new ArrayList<>();
+    private ArrayList<LocalDate> checkupHistory;
     private boolean isAdmit;
     private double pendingFee;
-    private ArrayList<String> diagnosis = new ArrayList<>();
+    private ArrayList<String> diagnosis;
     private ArrayList<Feedback> feedbacks;
     private final AppointmentManager appointmentManager;
 
@@ -128,10 +128,10 @@ public class Patient extends User {
 
     @Override
     public String toString() {
-        return String.format("\\nDetails:\\nUserID: %s\\tName: %s\\tAge: %s\\tGender: %s\\tAddress:" +
+        return String.format("\\nDetails:Name: %s\\tAge: %s\\tGender: %s\\tAddress:" +
                 " %s\\tPhone: %s\\tEmail: %s\\tPassword: %s\\Patient Details:\\Patient ID: %s\\tCheckup" +
                 " History: %s\\tAdmit: %b\\tPending Fee:  %f\\tDiagnosis:" +
-                " %s\\t", getUserID(), getName(), getAge(), getGender(), getAddress(), getPhone(), getEmail(),
+                " %s\\t", getName(), getAge(), getGender(), getAddress(), getPhone(), getEmail(),
                 getPassword(), patientID, checkupHistory, isAdmit, pendingFee, diagnosis);
     }
 }

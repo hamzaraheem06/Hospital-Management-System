@@ -2,6 +2,9 @@ import User.*; // importing every User class classes
 import Appointment.*;
 import HealthData.*;
 import D_P_Interaction.*;
+import ChatVideoConsultation.*;
+import Alert.*;
+import Notifications.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -342,6 +345,23 @@ public class Main {
 
         patient.generateReport();
         patient.generateMedicalReport();
+
+
+
+        ChatServer server = new ChatServer();
+        ChatClient client = new ChatClient(doctor, patient, server);
+
+        client.startConversation();
+
+        VideoCall call = new VideoCall();
+        call.startCall("Zoom", "ajfaksjf");
+
+        // Simulate a patient with abnormal vitals
+        VitalSign vital = new VitalSign(55, 88, "135/95", 38.2);
+
+        // Monitor and trigger alerts if needed
+        EmergencyAlert alert = new EmergencyAlert(vital, doctor, patient);
+        alert.checkVitals();
     }
 
     public static MedicalHistory generateMedicalHistory(Patient patient, Doctor doctor) {
@@ -349,7 +369,7 @@ public class Main {
         patientHistory.addConsultation("2024-02-10: Complained of fatigue and dizziness.");
         patientHistory.addConsultation("2024-02-20: Diagnosed with iron deficiency.");
         patientHistory.addConsultation("2024-03-05: Follow-up visit, improvement noted.");
-        
+
         // Create first Prescription
         Prescription prescription1 = new Prescription(patient, doctor);
         prescription1.addMedication("Iron Supplement", "100mg", "Once a day");

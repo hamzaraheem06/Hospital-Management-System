@@ -30,6 +30,14 @@ public class Admin extends User {
         return adminID;
     }
 
+    public ArrayList<Patient> getPatients() {
+        return patients;
+    }
+
+    public ArrayList<Doctor> getDoctors() {
+        return doctors;
+    }
+
     // Methods for adding users
 
     public void addDoctor(Doctor doctor) {

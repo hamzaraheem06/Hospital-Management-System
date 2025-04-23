@@ -17,7 +17,7 @@ public abstract class User {
     private static final String PASS_PATTERN = "^[a-zA-Z0-9@#$*&=+!]{8,20}+$";
     private static final char[] characters = {'a', 'b', 'c', 'd', 'e', 'f','A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     // declaring all the user attributes, keeping them private to ensure security and applying the encapsulation principle of OOP
-    private final String userID = randomIdGenerator();
+//    private final String userID = randomIdGenerator();
     private String name;
     private LocalDate dateOfBirth;
     private String gender;
@@ -93,9 +93,9 @@ public abstract class User {
     }
 
     // defining all the getters
-    public String getUserID() {
-        return userID;
-    }
+//    public String getUserID() {
+//        return userID;
+//    }
     public String getName() {
         return name;
     }
@@ -167,6 +167,6 @@ public abstract class User {
     // overriding the toString method to display the user
     @Override
     public String toString() {
-        return String.format("UserID: %S\tName: %s\tDate Of Birth: %s\tGender: %s\tAddress: %s\tPhone: %s\tEmail: %s\tPassword: %s", userID, name, dateOfBirth, gender, address, phone, email, password);
+        return String.format("Name: %s\tDate Of Birth: %s\tGender: %s\tAddress: %s\tPhone: %s\tEmail: %s\tPassword: %s", name, dateOfBirth, gender, address, phone, email, password);
     }
 }

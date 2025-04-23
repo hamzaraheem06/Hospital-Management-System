@@ -165,7 +165,7 @@ public class Doctor extends User{
 
     @Override
     public String toString() {
-        return String.format("\nDetails:\nUserID: %s\tName: %s\tAge: %ss\tGender: %s\tAddress: %s\tPhone: %s\tEmail: %s\tPassword: %s\nProfessional Details:\nDoctor ID: %s\tPMDC No: %s\tAvailability Hours: %s\tSalary: %.3f\tQualification: %s\tSpeciality: %s\tExperience: %d years\t", getUserID(), getName(), getAge(), getGender(), getAddress(), getPhone(), getEmail(), getPassword(), doctorID, PMDC_NO, availabilityHours, salary, qualification, speciality, yearsOfExperience);
+        return String.format("\nDetails:\nName: %s\tAge: %ss\tGender: %s\tAddress: %s\tPhone: %s\tEmail: %s\tPassword: %s\nProfessional Details:\nDoctor ID: %s\tPMDC No: %s\tAvailability Hours: %s\tSalary: %.3f\tQualification: %s\tSpeciality: %s\tExperience: %d years\t",getName(), getAge(), getGender(), getAddress(), getPhone(), getEmail(), getPassword(), doctorID, PMDC_NO, availabilityHours, salary, qualification, speciality, yearsOfExperience);
     }
 }
 
