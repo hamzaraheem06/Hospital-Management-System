@@ -310,58 +310,7 @@ public class Main {
         MedicalDatabase medicalDatabase = new MedicalDatabase(); // setting up the central Medical Database
         Scanner input = new Scanner(System.in);
 
-        System.out.println("Welcome to Ohio International Hospital");
 
-        Admin admin = generateAdmin(appointmentManager);
-
-        Doctor doctor = generateDoctor(appointmentManager);
-        admin.addDoctor(doctor);
-
-        // Creating the Patient object
-
-        Patient patient = generatePatient(appointmentManager);
-        admin.addPatient(patient);
-
-        // Patient schedules an appointment
-        LocalDate appointmentDate = LocalDate.of(2025, 5, 1);
-        patient.scheduleAppointment(doctor, patient, appointmentDate);
-
-        // Fetch the created appointment from the central manager
-        Appointment scheduledAppointment = appointmentManager.getAppointments().getFirst();
-
-        // admin approve appointment request
-        admin.approveAppointment(scheduledAppointment);
-
-        // Display all appointments to verify updates
-        System.out.println("\nAppointment List:");
-        appointmentManager.viewAppointments();
-
-        MedicalHistory patientHistory = generateMedicalHistory(patient, doctor);
-
-        MedicalDatabase.addPatientMedicalHistory(patient, patientHistory);
-
-        VitalSign sampleVitalSign = new VitalSign(75, 98, "120/80", 36.7);
-        VitalDatabase.addOrUpdatePatientVitals(patient, sampleVitalSign);
-
-        patient.generateReport();
-        patient.generateMedicalReport();
-
-
-
-        ChatServer server = new ChatServer();
-        ChatClient client = new ChatClient(doctor, patient, server);
-
-        client.startConversation();
-
-        VideoCall call = new VideoCall();
-        call.startCall("Zoom", "ajfaksjf");
-
-        // Simulate a patient with abnormal vitals
-        VitalSign vital = new VitalSign(55, 88, "135/95", 38.2);
-
-        // Monitor and trigger alerts if needed
-        EmergencyAlert alert = new EmergencyAlert(vital, doctor, patient);
-        alert.checkVitals();
     }
 
     public static MedicalHistory generateMedicalHistory(Patient patient, Doctor doctor) {

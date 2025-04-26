@@ -1,49 +1,107 @@
 package Appointment;
 import User.*;
+import Exceptions.*;
 
 import java.util.ArrayList;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 // Appointment manager is the only class that stores all the appointments, update the appointment list, remove anything, or approve/reject everything
 // is controlled by this class
 public class AppointmentManager {
-    private ArrayList<Appointment> appointments; // This arraylist is the global appointment store, no other store should
+    private final ArrayList<Appointment> appointments; // This arraylist is the global appointment store, no other store should
     // exist that contradicts its elements
 
     public AppointmentManager() {
         this.appointments = new ArrayList<>();
     }
 
-    public void requestAppointment(LocalDate date, Doctor doctor, Patient patient) {
-        Appointment appointment = new Appointment(date, doctor, patient,  Appointment.AppointmentStatus.PENDING);
-        appointments.add(appointment);
-        System.out.println("Appointment requested: " + appointment);
+    // Create a new appointment
+    public void requestAppointment(LocalDateTime dateTime, Doctor doctor, Patient patient)
+            throws InvalidAppointmentException, DuplicateAppointmentException {
+        if (dateTime == null || doctor == null || patient == null) {
+            throw new InvalidAppointmentException("Appointment request failed. Date & Time, doctor, or patient cannot be null.");
+        }
+
+        if (dateTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidAppointmentException("Appointment request failed. Appointment date & time cannot be in the past.");
+        }
+
+        if (isDuplicateAppointment(dateTime, doctor, patient)) {
+            throw new DuplicateAppointmentException("Appointment request failed. A similar appointment already exists.");
+        }
+
+        appointments.add(new Appointment(dateTime, doctor, patient, Appointment.AppointmentStatus.PENDING));
+        System.out.println("Appointment successfully requested for: " + dateTime);
     }
 
-    public void approveAppointment(Appointment appointment) {
-        if (appointments.contains(appointment) && appointment.getStatus() == Appointment.AppointmentStatus.PENDING) {
-            appointment.updateStatus( Appointment.AppointmentStatus.APPROVED);
-            System.out.println("Appointment approved: " + appointment);
-        } else {
-            System.out.println("Appointment not found or not in pending state.");
+
+    public void approveAppointment(Appointment appointment)
+            throws InvalidAppointmentException, AppointmentNotFoundException {
+        if (appointment == null) {
+            throw new InvalidAppointmentException("Cannot approve. Appointment cannot be null.");
         }
+
+        if (!appointments.contains(appointment)) {
+            throw new AppointmentNotFoundException("Cannot approve. Appointment not found in the system.");
+        }
+
+        appointment.updateStatus(Appointment.AppointmentStatus.APPROVED);
+        System.out.println("Appointment approved successfully.");
     }
 
-    public void cancelAppointment(Appointment appointment) {
-        if (appointments.contains(appointment)) {
-            appointment.updateStatus(Appointment.AppointmentStatus.CANCELED);
-            System.out.println("Appointment canceled: " + appointment);
-        } else {
-            System.out.println("Appointment not found.");
+
+    public void cancelAppointment(Appointment appointment)
+            throws InvalidAppointmentException, AppointmentNotFoundException {
+        if (appointment == null) {
+            throw new InvalidAppointmentException("Cannot cancel. Appointment cannot be null.");
         }
+
+        if (!appointments.remove(appointment)) {
+            throw new AppointmentNotFoundException("Cannot cancel. Appointment not found in the system.");
+        }
+
+        appointment.updateStatus(Appointment.AppointmentStatus.CANCELED);
+        System.out.println("Appointment cancelled successfully.");
     }
 
-    public void updateAppointmentStatus(Appointment appointment, Appointment.AppointmentStatus newStatus) {
-        if (appointments.contains(appointment)) {
-            appointment.updateStatus(newStatus);
-        } else {
-            System.out.println("Appointment not found.");
+    public void rescheduleAppointment(Appointment appointment, LocalDateTime newDateTime)
+            throws InvalidAppointmentException, AppointmentNotFoundException, DuplicateAppointmentException {
+        if (appointment == null || newDateTime == null) {
+            throw new InvalidAppointmentException("Cannot reschedule. Appointment or new date & time cannot be null.");
         }
+
+        if (!appointments.contains(appointment)) {
+            throw new AppointmentNotFoundException("Cannot reschedule. Appointment not found in the system.");
+        }
+
+        if (newDateTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidAppointmentException("Cannot reschedule. The new appointment date & time cannot be in the past.");
+        }
+
+        if (isDuplicateAppointment(newDateTime, appointment.getDoctor(), appointment.getPatient())) {
+            throw new DuplicateAppointmentException("Cannot reschedule. A similar appointment already exists at the chosen time.");
+        }
+
+        appointment.updateDateTime(newDateTime);
+        System.out.println("Appointment rescheduled successfully to: " + newDateTime);
+    }
+
+
+
+    public void updateAppointmentStatus(Appointment appointment, Appointment.AppointmentStatus newStatus)
+            throws InvalidAppointmentException, AppointmentNotFoundException, DuplicateAppointmentException {
+
+        if (appointment == null || newStatus == null) {
+            throw new InvalidAppointmentException("Cannot update the status. Appointment or new date & time cannot be null.");
+        }
+
+        if (!appointments.contains(appointment)) {
+            throw new AppointmentNotFoundException("Cannot update status. Appointment not found in the system.");
+        }
+
+        appointment.updateStatus(newStatus);
+        System.out.println("Appointment status updated successfully to" + newStatus + " .");
     }
 
     public ArrayList<Appointment> getAppointments() {
@@ -153,10 +211,29 @@ public class AppointmentManager {
         System.out.println();
     }
 
+    public boolean isDuplicateAppointment(LocalDateTime dateTime, Doctor doctor, Patient patient) {
+        for (Appointment appointment : appointments) {
+            if (appointment.getDateTime().equals(dateTime) &&
+                    appointment.getDoctor().equals(doctor) &&
+                    appointment.getPatient().equals(patient)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean contains(Appointment appointment) {
+        return appointments.contains(appointment);
+    }
+
     public void viewAppointments() {
         for (Appointment appointment : appointments) {
             System.out.println(appointment);
             System.out.println();
         }
     }
+
+//    public boolean isDuplicateAppointment(LocalDate date, Doctor doctor, User.Patient patient) {
+//
+//    }
 }

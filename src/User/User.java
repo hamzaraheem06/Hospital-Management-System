@@ -2,10 +2,16 @@ package User;
 
 import Appointment.Appointment;
 
+import java.time.LocalDateTime;
 import java.util.Random; // using the Random class to generate a user id
 import java.util.regex.Pattern; // using the Pattern class for credentials and information matching
 import java.time.Period; // using the Calendar class for age calculation
 import java.time.LocalDate;
+import Exceptions.*;
+
+
+// custom exception classes
+
 
 // base class for application users
 // Identifiers (variables and method names) are chosen in a sense that they are self-explanatory
@@ -27,7 +33,8 @@ public abstract class User {
     private String password;
 
     // defining the constructor;
-    User(String name, LocalDate dob, String gender, String address, String phone, String email, String password) {
+    User(String name, LocalDate dob, String gender, String address, String phone, String email, String password)
+            throws InvalidNameException, InvalidDateOfBirthException, InvalidGenderException, InvalidEmailException, InvalidPasswordException {
         setName(name);
         setDateOfBirth(dob);
         setGender(gender);
@@ -35,62 +42,55 @@ public abstract class User {
         setPhone(phone);
         setEmail(email);
         setPassword(password);
-        // using setters to validate entries
     }
 
+
     // defining all the setters with validations
-    public void setName(String name) {
-        if(!isValidName(name)) {
-            System.out.println("Invalid name!");
-            this.name = null;
-            return;
+    public void setName(String name) throws InvalidNameException {
+        if (!isValidName(name)) {
+            throw new InvalidNameException("Invalid name! Name must match pattern: " + NAME_PATTERN);
         }
         this.name = name;
     }
 
-    public void setDateOfBirth(LocalDate birthDate) { // method to calculate and set age of the user
-        if (birthDate == null) {
-            System.out.println("Invalid age!");
-            return;
+
+    public void setDateOfBirth(LocalDate birthDate) throws InvalidDateOfBirthException {
+        if (birthDate == null || birthDate.isAfter(LocalDate.now())) {
+            throw new InvalidDateOfBirthException("Invalid date of birth! Please provide a valid past date.");
         }
         this.dateOfBirth = birthDate;
     }
 
-    public void setGender(String gender) {
-        if(gender.equals("male") || gender.equals("female")) { // let's be real there are only two genders
-            this.gender = gender;
+
+    public void setGender(String gender) throws InvalidGenderException {
+        if (!gender.equalsIgnoreCase("male") && !gender.equalsIgnoreCase("female")) {
+            throw new InvalidGenderException("Invalid gender! Only 'male' or 'female' are allowed.");
         }
-        else {
-            System.out.println("Invalid gender!"); // get this mentally ill wierdo
-            this.gender = null;
-        }
+        this.gender = gender;
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.address = address; // No specific validation required for address
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone = phone; // Assuming no validation for simplicity
     }
 
-    public void setEmail(String email) {
-        if(!isValidEmail(email)) {
-            System.out.println("Invalid email!");
-            this.email = null;
-            return;
+    public void setEmail(String email) throws InvalidEmailException {
+        if (!isValidEmail(email)) {
+            throw new InvalidEmailException("Invalid email! Email must match pattern: " + MAIL_PATTERN);
         }
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        if(!isValidPassword(password)) {
-            System.out.println("Invalid password!");
-            this.password = null;
-            return;
+    public void setPassword(String password) throws InvalidPasswordException {
+        if (!isValidPassword(password)) {
+            throw new InvalidPasswordException("Invalid password! Password must match pattern: " + PASS_PATTERN);
         }
         this.password = password;
     }
+
 
     // defining all the getters
 //    public String getUserID() {
@@ -148,7 +148,7 @@ public abstract class User {
     }
 
     // declaring abstract methods
-    public abstract void scheduleAppointment(Doctor doctor, Patient patient, LocalDate date);
+    public abstract void scheduleAppointment(Doctor doctor, Patient patient, LocalDateTime dateTime);
 
     public abstract void cancelAppointment(Appointment appointment);
 

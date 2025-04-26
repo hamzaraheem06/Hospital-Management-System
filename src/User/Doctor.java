@@ -4,8 +4,10 @@ package User;
 import Appointment.Appointment;
 import Appointment.AppointmentManager;
 import D_P_Interaction.Feedback;
+import Exceptions.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 
@@ -24,7 +26,8 @@ public class Doctor extends User{
     private final AppointmentManager appointmentManager;
 
     // defining all the constructors
-    public Doctor( AppointmentManager manager, String name, LocalDate dob, String gender, String address, String phone, String email, String password, String PMDC_NO, String availabilityHours, double salary, String qualification, String speciality, int experience) {
+    public Doctor( AppointmentManager manager, String name, LocalDate dob, String gender, String address, String phone, String email, String password, String PMDC_NO, String availabilityHours, double salary, String qualification, String speciality, int experience)
+            throws InvalidNameException, InvalidDateOfBirthException, InvalidGenderException, InvalidEmailException, InvalidPasswordException{
         super(name, dob, gender, address, phone, email, password );
         setPMDC_NO(PMDC_NO);
         setAvailabilityHours(availabilityHours);
@@ -36,7 +39,7 @@ public class Doctor extends User{
     }
 
     // a very demure copy constructor
-    public Doctor(Doctor doctor) {
+    public Doctor(Doctor doctor) throws InvalidNameException, InvalidDateOfBirthException, InvalidGenderException, InvalidEmailException, InvalidPasswordException{
         super(doctor.getName(), doctor.getDateOfBirth(), doctor.getGender(), doctor.getAddress(), doctor.getPhone(), doctor.getEmail(), doctor.getPassword());
         this.appointmentManager = doctor.appointmentManager;
         setPMDC_NO(doctor.getPMDC_NO());
@@ -153,15 +156,75 @@ public class Doctor extends User{
 
     // consistent appointment scheduler and cancel methods
     @Override
-    public void scheduleAppointment(Doctor doctor, Patient patient, LocalDate date) {
-        appointmentManager.requestAppointment(date, this, patient);
-        System.out.println("Appointment scheduled for " + date + ".");
+    public void scheduleAppointment(Doctor doctor, Patient patient, LocalDateTime dateTime) {
+        try {
+            // Parameter checks
+            if (patient == null) {
+                throw new InvalidAppointmentException("Patient cannot be null.");
+            }
+            if (dateTime == null) {
+                throw new InvalidAppointmentException("Appointment date and time cannot be null.");
+            }
+            if (dateTime.isBefore(LocalDateTime.now())) {
+                throw new InvalidAppointmentException("Appointment date and time cannot be in the past.");
+            }
+
+            if(appointmentManager.isDuplicateAppointment(dateTime, doctor, patient)) {
+                throw new DuplicateAppointmentException("Duplicate appointment exists.");
+            }
+
+            // Request a new appointment
+            appointmentManager.requestAppointment(dateTime, this, patient);
+        } catch (InvalidAppointmentException | DuplicateAppointmentException e) {
+            System.out.println("Error scheduling appointment: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
     @Override
     public void cancelAppointment(Appointment appointment) {
-        appointmentManager.cancelAppointment(appointment);
+        try {
+            // Parameter check
+            if (appointment == null) {
+                throw new InvalidAppointmentException("Appointment cannot be null.");
+            }
+
+            if(!appointmentManager.contains(appointment)) {
+                throw new AppointmentNotFoundException("Appointment not found in the system.");
+            }
+
+            // Cancel the specified appointment
+            appointmentManager.cancelAppointment(appointment);
+        } catch (InvalidAppointmentException | AppointmentNotFoundException e) {
+            System.out.println("Error canceling appointment: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
+
+    public void rescheduleAppointment(Appointment appointment, LocalDateTime newDateTime)
+            throws InvalidAppointmentException, AppointmentNotFoundException, DuplicateAppointmentException {
+        if (appointment == null || newDateTime == null) {
+            throw new InvalidAppointmentException("Cannot reschedule. Appointment or new date & time cannot be null.");
+        }
+
+        if (!appointmentManager.contains(appointment)) {
+            throw new AppointmentNotFoundException("Cannot reschedule. Appointment not found in the system.");
+        }
+
+        if (newDateTime.isBefore(LocalDateTime.now())) {
+            throw new InvalidAppointmentException("Cannot reschedule. The new appointment date & time cannot be in the past.");
+        }
+
+        if (appointmentManager.isDuplicateAppointment(newDateTime, appointment.getDoctor(), appointment.getPatient())) {
+            throw new DuplicateAppointmentException("Cannot reschedule. A similar appointment already exists at the chosen time.");
+        }
+
+        appointment.updateDateTime(newDateTime);
+        System.out.println("Appointment rescheduled successfully to: " + newDateTime);
+    }
+
 
     @Override
     public String toString() {
